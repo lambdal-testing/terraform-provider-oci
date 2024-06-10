@@ -545,28 +545,28 @@ func (p ResourceDataConfigProvider) KeyID() (string, error) {
 }
 
 func (p ResourceDataConfigProvider) PrivateRSAKey() (key *rsa.PrivateKey, err error) {
-    password := ""
-    if privateKeyPassword, hasPrivateKeyPassword := p.D.GetOkExists(globalvar.PrivateKeyPasswordAttrName); hasPrivateKeyPassword {
-        password = privateKeyPassword.(string)
-    }
+	password := ""
+	if privateKeyPassword, hasPrivateKeyPassword := p.D.GetOkExists(globalvar.PrivateKeyPasswordAttrName); hasPrivateKeyPassword {
+		password = privateKeyPassword.(string)
+	}
 
-    if privateKey, hasPrivateKey := p.D.GetOkExists(globalvar.PrivateKeyAttrName); hasPrivateKey {
-        keyData := privateKey.(string)
-        keyData = strings.ReplaceAll(keyData, "\\n", "\n") // Ensure \n is replaced by actual newlines
-        return oci_common.PrivateKeyFromBytes([]byte(keyData), &password)
-    }
+	if privateKey, hasPrivateKey := p.D.GetOkExists(globalvar.PrivateKeyAttrName); hasPrivateKey {
+		keyData := privateKey.(string)
+		keyData = strings.ReplaceAll(keyData, "\\n", "\n") // Ensure \n is replaced by actual newlines
+		return oci_common.PrivateKeyFromBytes([]byte(keyData), &password)
+	}
 
-    if privateKeyPath, hasPrivateKeyPath := p.D.GetOkExists(globalvar.PrivateKeyPathAttrName); hasPrivateKeyPath {
-        resolvedPath := utils.ExpandPath(privateKeyPath.(string))
-        pemFileContent, readFileErr := ioutil.ReadFile(resolvedPath)
+	if privateKeyPath, hasPrivateKeyPath := p.D.GetOkExists(globalvar.PrivateKeyPathAttrName); hasPrivateKeyPath {
+		resolvedPath := utils.ExpandPath(privateKeyPath.(string))
+		pemFileContent, readFileErr := ioutil.ReadFile(resolvedPath)
 
-        if readFileErr != nil {
-            return nil, fmt.Errorf("can not read private key from: '%s', Error: %q", privateKeyPath, readFileErr)
-        }
-        return oci_common.PrivateKeyFromBytes(pemFileContent, &password)
-    }
+		if readFileErr != nil {
+			return nil, fmt.Errorf("can not read private key from: '%s', Error: %q", privateKeyPath, readFileErr)
+		}
+		return oci_common.PrivateKeyFromBytes(pemFileContent, &password)
+	}
 
-    return nil, fmt.Errorf("can not get private_key or private_key_path from Terraform configuration")
+	return nil, fmt.Errorf("can not get private_key or private_key_path from Terraform configuration")
 }
 
 func BuildHttpClient() (httpClient *http.Client) {
